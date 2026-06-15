@@ -87,7 +87,9 @@ Porque un socket para un protocolo TCP _requiere establecer una conexión_, mien
 > 5. Protocolo de aplicación. Dialogo entre cliente y servidor basado en mensajes petición/respuesta. _(READ, WRITE, SEND, RECV)_
 > 6. Cerrar la conexión, eliminando el _**socket**_. _(CLOSE, SHUTDOWN)_
 >
-> [!NOTE]
+
+>  ℹ️ **Información**
+>
 > El item 3 (*) es opcional.
 
 ## Algoritmo de un cliente UDP
@@ -98,5 +100,34 @@ Porque un socket para un protocolo TCP _requiere establecer una conexión_, mien
 > 5. Protocolo de aplicación. Dialogo entre cliente y servidor basado en mensajes petición/respuesta. _(SENDTO, RECVFROM, READ*, WRITE*, SEND*, RECV*)_.
 > 6. Eliminar el _**socket**_. _(CLOSE)_
 >
->[!NOTE]
->El item 4(*) es opcional.
+
+>  ℹ️ **Información**
+>
+> El item 4(*) es opcional.
+
+Creamos el socket utilizando SOCK_DGRAM indicando que no hay que esperar que se inicie una conexión, luego de crear el socket y creamos un **bind** para vincular el puerto con el socket creado. Al finalizar, eliminamos el socket usando CLOSE.
+
+### Consideraciones sobre el algoritmo UDP
+- PASO 4: CONNECT sobre un socket UDP (Opcional)
+    - Define la asociación entre un cliente y servidor UDP:
+        - Comunicación restringida al servidor asociado.
+        - No conlleva intercambio de mensajes.
+        - Se pueden usar _READ, WRITE, SEND, RECV_, solamente porque se utilizo CONNECT.
+- PASO 5: Transferencia compacta(SIN UTILIZAR CONNECT)
+    - Por cada SENDTO se envía todo el mensaje en un solo datagrama, permitiendo asi obtenerlo con un solo RECVFROM.
+- PASO 6: Fin de servicio:
+    - Al eliminar un socket, el protocolo UDP no informa al otro extremo, rechazando asi los mensajes dirigidos al puerto que estaba vinculado a dicho socket.
+
+> El hecho de usar CONNECT en UDP, me permite poder utilizar las mismas directivas(READ,WRITE,SEND,RECV) que se utilizan en TCP. Es una decision de software, no genera una ventaja.
+
+---
+
+## Servicio DAYTIME
+Es un servicio estándar de internet que suministra la fecha y hora actual en una cadena de caracteres [RFC867].
+
+Puerto de _**DAYTIME**_ bien-conocido: 13.
+
+Servicio implementado sobre **TCP** y **UDP**.
+
+
+
